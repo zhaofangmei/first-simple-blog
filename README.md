@@ -1,4 +1,3 @@
-# first-simple-blog
 推荐网址：
 
 https://github.com/nswbmw/N-blog/blob/backup/book/%E7%AC%AC1%E7%AB%A0%20%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84%E5%8D%9A%E5%AE%A2.md
@@ -83,7 +82,6 @@ var upload = multer({ storage: storage })
   　　// ...
 　　});
 　
- 
 7、留言功能实现
 
 　conng更新Post的comments时，会报错：Error: ER_DATA_TOO_LONG: Data too long for column 'comments' at row 1
@@ -91,3 +89,19 @@ var upload = multer({ storage: storage })
 　解决办法： 
 
 　（1）将comments字段类型varchart改为longtext      https://segmentfault.com/q/1010000009129135
+
+
+8、ejs 渲染moment.js库（将时间戳日期格式化）
+
+　　(1)项目里安装moment:npm install moment --save
+
+　　(2)app.js加入如下代码：
+
+　　var moment = require('moment')
+
+　　在var app = express();后面加入 app.locals.moment = moment;
+
+　　（3）页面渲染调用格式为：<%= moment(new Date(parseInt("要解析的值"))).format('YYYY-MM-DD HH:MM:SS') %>
+
+
+ 
