@@ -21,14 +21,23 @@ module.exports = function (app) {
     if (!req.session.user) {
       return res.redirect('/login');
     }
-    Post.getAll(null, function (err, posts) {
+    let query = {
+      name: null,
+      pageSize: 5,
+      pageIndex: parseInt(req.query.page) || 1
+    }
+    Post.getPage(query, function (err, posts, sumResults) {
       if (err) {
         posts = [];
       }
+      let total = sumResults[0].sum || 0;
       res.render('index', {
         title: '主页',
         user: req.session.user,
         posts: posts,
+        pageIndex: query.pageIndex,
+        isFirstPage: (query.pageIndex - 1) == 0,
+        isLastPage: ((query.pageIndex - 1) * query.pageSize + posts.length) == total,
         success: req.flash('success').toString(),
         error: req.flash('error').toString()
       });
@@ -182,15 +191,24 @@ module.exports = function (app) {
         req.flash('error', '用户不存在!');
         return res.redirect('/login');
       }
-      Post.getAll(userName, (err, posts) => {
+      let query = {
+        name: userName,
+        pageIndex: parseInt(req.query.page) || 1,
+        pageSize: 5
+      }
+      Post.getPage(query, (err, posts, sumResults) => {
         if (err) {
           req.flash('error', err);
           return res.redirect('/');
         }
+        let total = sumResults[0].sum || 0;
         res.render('user', {
           title: users[0].user_name,
           posts: posts,
           user: req.session.user,
+          pageIndex: query.pageIndex,
+          isFirstPage: (query.pageIndex - 1) == 0,
+          isLastPage: ((query.pageIndex - 1) * query.pageSize + posts.length) == total,
           success: req.flash('success').toString(),
           error: req.flash('error').toString()
         });

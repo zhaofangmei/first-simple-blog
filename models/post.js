@@ -54,6 +54,48 @@ Post.getAll = function (name, callback) {
     console.log(findAll.sql)
 }
 
+
+Post.getPage = function (params, callback) {
+    let pageSize = params.pageSize && parseInt(params.pageSize) || 5;
+    pageSize = pageSize > 0 && pageSize < 101 && pageSize || 5;
+    let pageIndex = params.pageIndex && parseInt(params.pageIndex) || 1;
+    let limit = pageSize;
+    let offset = (pageIndex - 1) * params.pageSize;
+    let sqlString = 'select * from t_blog_post ';
+    if (params.name) {
+        sqlString += 'where user_name = "' + params.name + '"';
+    }
+    sqlString += ' limit ' + limit + ' offset ' + offset;
+    let findPage = conn.query(sqlString, function (error, results, fields) {
+        if (error) {
+            console.log('error: ', error)
+            return callback(error);
+        }
+        if (results) {
+            results.forEach(doc => {
+                doc.post = markdown.toHTML(doc.post)
+            });
+            let countString = 'select count(*) as sum from t_blog_post ';
+            if (params.name) {
+                countString += 'where user_name = "' + params.name + '"';
+            }
+            let findSum = conn.query(countString, function (error, sumResults, fields) {
+                if (error) {
+                    console.log('error: ', error)
+                    return callback(error);
+                }
+                if(sumResults) {
+                    return callback(null, results, sumResults);
+                }
+            });
+            console.log(findSum.sql)
+            // return callback(null, results);
+        }
+    });
+    console.log(findPage.sql)
+}
+
+
 Post.getOne = function (query, callback) {
     let sqlString = '';
     if (query.name && query.time && query.title) {
