@@ -11,6 +11,7 @@ var settings = require('./settings');
 var session = require('express-session');
 var MySQLStore = require('express-mysql-session')(session);
 var flash = require('connect-flash');
+var moment = require('moment')
 
 var connection = mysql.createConnection({
   host: settings.host,
@@ -22,6 +23,9 @@ var connection = mysql.createConnection({
 var sessionStore = new MySQLStore({}/* session store options */, connection);
 
 var app = express();
+
+//ejs渲染moment
+app.locals.moment = moment; 
 
 // view engine setup
 //设置端口号

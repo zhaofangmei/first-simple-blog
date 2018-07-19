@@ -1,7 +1,7 @@
 <br />
 <% post.comments.forEach(function (comment, index) { %>
   <p><a href="<%= comment.website %>"><%= comment.user_name %></a>
-  <span class="info"> 回复于 <%= comment.create_time %></span></p>
+  <span class="info"> 回复于 <%= moment(new Date(parseInt(comment.create_time))).format('YYYY-MM-DD HH:MM:SS') %> </span></p>
   <p><%- comment.content %></p>
 <% }) %>
 

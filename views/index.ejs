@@ -11,7 +11,7 @@
         <p><h2><a href="/user/<%= post.user_name %>/<%= post.create_time%>/<%= post.title%>"><%= post.title %></a></h2></p>
         <p class="info">
           作者：<a href="/user/<%= post.user_name %>"><%= post.user_name %></a> | 
-          日期：<%= post.create_time %>
+          日期：<%= moment(new Date(parseInt(post.create_time))).format('YYYY-MM-DD HH:MM:SS') %>
         </p>
         <p><%- post.post %></p>
       <% }) %>
