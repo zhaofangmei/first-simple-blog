@@ -30,6 +30,9 @@ module.exports = function (app) {
       if (err) {
         posts = [];
       }
+      posts.forEach(post => {
+        post.comments = JSON.parse(post.comments);
+      });
       let total = sumResults[0].sum || 0;
       res.render('index', {
         title: '主页',
@@ -76,7 +79,6 @@ module.exports = function (app) {
       req.flash('success', '登陆成功!');
       res.redirect('/'); //登陆成功后跳转到主页
     });
-
   });
 
   /**
@@ -143,19 +145,30 @@ module.exports = function (app) {
    */
   app.get('/post', checkLogin);
   app.get('/post', function (req, res) {
-    res.render('post', {
-      title: '发表',
-      user: req.session.user,
-      success: req.flash('success').toString(),
-      error: req.flash('error').toString()
+    let userName = req.session.user.user_name;
+    Post.getTagsByName(userName, function(error, tags) {
+      if (error) {
+        req.flash('error', error);
+        tags = [];
+      }
+      res.render('post', {
+        title: '发表',
+        user: req.session.user,
+        tags: tags,
+        success: req.flash('success').toString(),
+        error: req.flash('error').toString()
+      });
     });
   });
   app.post('/post', checkLogin);
   app.post('/post', function (req, res) {
     let user = req.session.user;
     let title = req.body.title;
-
-    let post = new Post(user.user_name, title, req.body.post);
+    if(!title) {
+      req.flash('error', '标题不可为空!');
+      return res.redirect('/post');
+    }
+    let post = new Post(user.user_name, title, req.body.tag, req.body.post);
 
     post.save(function (error, success) {
       if (error) {
@@ -234,7 +247,6 @@ module.exports = function (app) {
         success: req.flash('success').toString(),
         error: req.flash('error').toString()
       });
-
     });
   });
   app.post('/user/:name/:time/:title', checkLogin);
@@ -276,13 +288,22 @@ module.exports = function (app) {
         return res.redirect('back');
       }
       if (posts && posts.length > 0) {
-        res.render('edit', {
-          title: '编辑',
-          post: posts[0],
-          user: req.session.user,
-          success: req.flash('success').toString(),
-          error: req.flash('error').toString()
+        let userName = req.session.user.user_name;
+        Post.getTagsByName(userName, function(error, tags) {
+          if (error) {
+            req.flash('error', error);
+            tags = [];
+          }
+          res.render('edit', {
+            title: '编辑',
+            post: posts[0],
+            tags: tags,
+            user: req.session.user,
+            success: req.flash('success').toString(),
+            error: req.flash('error').toString()
+          });
         });
+        
       } else {
         req.flash('error', '无权限！');
         return res.redirect('back');
@@ -337,7 +358,6 @@ module.exports = function (app) {
     });
   });
 
-
   /**
    * 文件上传
    */
@@ -354,6 +374,48 @@ module.exports = function (app) {
   app.post('/upload', upload.array('field1', 5), function (req, res) {
     req.flash('success', '文件上传成功!');
     res.redirect('/upload');
+  });
+
+  /**
+   * 标签列表
+   */
+  app.get('/tags', checkLogin);
+  app.get('/tags', function(req, res) {
+    Post.getTags((err, tags) => {
+      if (err) {
+        req.flash('error',err); 
+        return res.redirect('/');
+      }
+      res.render('tags', {
+        title: '标签',
+        tags: tags,
+        user: req.session.user,
+        success: req.flash('success').toString(),
+        error: req.flash('error').toString()
+      });
+    });
+
+  });
+
+  /**
+   * 标签对应的博客
+   */
+  app.get('/tags/:tag', checkLogin);
+  app.get('/tags/:tag', function(req, res) {
+    Post.getTag(req.params.tag, (err, posts) => {
+      if (err) {
+        req.flash('error',err); 
+        return res.redirect('/');
+      }
+      res.render('tag', {
+        title: 'TAG:' + req.params.tag,
+        posts: posts,
+        user: req.session.user,
+        success: req.flash('success').toString(),
+        error: req.flash('error').toString()
+      });
+    });
+
   });
 
   function checkLogin(req, res, next) {

@@ -2,8 +2,33 @@
 <form method="post">
   标题：<br />
   <input type="text" name="title" /><br />
+  标签：<br />
+  <input type="text" name="tag" id="tagValue"/>
+  <input type="button" id="tagBtn" value="已有标签"/>
+  <select id="tagsList" style="display: none;">
+    <% tags.forEach(function (tag, index) { %>
+      <option value ="<%= tag.tag %>"><%= tag.tag %></option>
+      <% }) %>
+  </select>
+  <br />
   正文：<br />
   <textarea name="post" rows="20" cols="100"></textarea><br />
   <input type="submit" value="发表" />
 </form>
+<script>
+    onload = function() {
+      let select = document.getElementById('tagsList');
+      let button = document.getElementById('tagBtn');
+      let input = document.getElementById('tagValue');
+      button.onclick = function() {
+        select.style.display = '';
+        input.value = select.options[0].value;
+      }
+      select.onchange = function(){
+        var index = select.selectedIndex; //选中索引
+        var value = select.options[index].value; //选中值
+        input.value = value;
+      }
+    }
+  </script>
 <%- include footer %>

@@ -2,9 +2,10 @@ const DB = require('./db.js');
 const conn = DB.getConnection();
 const markdown = require('markdown').markdown;
 
-function Post(userName, title, post) {
+function Post(userName, title, tag, post) {
     this.userName = userName;
     this.title = title;
+    this.tag = tag;
     this.post = post;
 }
 
@@ -17,6 +18,8 @@ Post.prototype.save = function (callback) {
         create_time: time,
         title: this.title,
         post: this.post,
+        tag: this.tag,
+        pv: 0,
         comments: JSON.stringify([])
     }
 
@@ -53,7 +56,6 @@ Post.getAll = function (name, callback) {
     });
     console.log(findAll.sql)
 }
-
 
 Post.getPage = function (params, callback) {
     let pageSize = params.pageSize && parseInt(params.pageSize) || 5;
@@ -94,8 +96,11 @@ Post.getPage = function (params, callback) {
     });
     console.log(findPage.sql)
 }
-
-
+/**
+ * 获取博客详情
+ * @param {*} query 
+ * @param {*} callback 
+ */
 Post.getOne = function (query, callback) {
     let sqlString = '';
     if (query.name && query.time && query.title) {
@@ -113,18 +118,28 @@ Post.getOne = function (query, callback) {
             results.forEach(doc => {
                 doc.post = markdown.toHTML(doc.post);
                 doc.comments = JSON.parse(doc.comments);
-                // doc.comments.forEach(function (comment) {
-                //     comment.content = markdown.toHTML(comment.content);
-                // });
             });
+            let post = results[0];
+            //更新阅读pv
+            let updateString = 'update t_blog_post set pv=pv+1 where user_name = ? and create_time = ? ';
+            let update = conn.query(updateString, [post.user_name, post.create_time], function (error, results, fields) {
+                if (error) {
+                    console.log('error: ', error)
+                    return callback(error);
+                }
+            });
+            console.log(update.sql);
             return callback(null, results);
         }
     });
-
     console.log(findOne.sql)
-
 }
 
+/**
+ * 编辑
+ * @param {*} query 
+ * @param {*} callback 
+ */
 Post.edit = function (query, callback) {
     if (query.name && query.time && query.title) {
         let sqlString = 'select * from  t_blog_post where user_name = ? and create_time = ? and title = ? ';
@@ -187,4 +202,62 @@ Post.remove = function (query, callback) {
 
     }
 
+}
+/**
+ * 根据用户名获取标签列表
+ * @param {*} name 
+ * @param {*} callback 
+ */
+Post.getTagsByName = function (name, callback) {
+    let sqlString = 'select DISTINCT(tag) from t_blog_post where user_name = ?';
+    let findTag = conn.query(sqlString, [name], (error, results, fields) => {
+        if (error) {
+            console.log('error: ', error)
+            return callback(error);
+        }
+        if (results) {
+            return callback(null, results);
+        } 
+    });
+    console.log(findTag.sql)
+}
+/**
+ * 获取所有标签
+ * @param {*} callback 
+ */
+Post.getTags = function (callback) {
+    let sqlString = 'select DISTINCT(tag) from t_blog_post';
+    let findTags = conn.query(sqlString, (error, results, fields) => {
+        if (error) {
+            console.log('error: ', error)
+            return callback(error);
+        }
+        if (results) {
+            return callback(null, results);
+        } 
+    });
+    console.log(findTags.sql)
+}
+
+/**
+ * 根据标签名获取所有博客列表
+ * @param {*} tag 
+ * @param {*} callback 
+ */
+Post.getTag = function (tag, callback) {
+    if(tag) {
+        let sqlString = 'select * from t_blog_post where tag = ?';
+        let findOne = conn.query(sqlString, [tag], function (error, results, fields) {
+            if (error) {
+                console.log('error: ', error)
+                return callback(error);
+            }
+            if (results) {
+                return callback(null, results);
+            }
+        });
+        console.log(findOne.sql)
+    } else {
+        return callback('参数异常！')
+    }
 }
