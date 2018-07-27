@@ -15,7 +15,8 @@ Comment.prototype.save = function (callback) {
     let query = {
         name: this.user_name,
         time: this.create_time,
-        title: this.title
+        title: this.title,
+        aginAsk: true
     }
 
     Post.getOne(query, (err, posts) => {

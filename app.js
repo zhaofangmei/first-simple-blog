@@ -11,7 +11,8 @@ var settings = require('./settings');
 var session = require('express-session');
 var MySQLStore = require('express-mysql-session')(session);
 var flash = require('connect-flash');
-var moment = require('moment')
+var moment = require('moment');
+var RateLimit = require('express-rate-limit');
 
 var connection = mysql.createConnection({
   host: settings.host,
@@ -55,6 +56,21 @@ app.use(session({
   resave: false,
   saveUninitialized: false
 }));
+
+app.use(function (req, res, next) {
+  console.log('1111111111111 path', req.path);
+  next();
+});
+
+app.enable('trust proxy');
+
+var limiter = new RateLimit({
+  windowMs: 1*60*1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  delayMs: 0 // disable delaying - full speed until the max limit is reached
+});
+//  apply to all requests
+app.use(limiter);
 
 //加载路由
 indexRouter(app);

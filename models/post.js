@@ -119,16 +119,18 @@ Post.getOne = function (query, callback) {
                 doc.post = markdown.toHTML(doc.post);
                 doc.comments = JSON.parse(doc.comments);
             });
-            let post = results[0];
-            //更新阅读pv
-            let updateString = 'update t_blog_post set pv=pv+1 where user_name = ? and create_time = ? ';
-            let update = conn.query(updateString, [post.user_name, post.create_time], function (error, results, fields) {
-                if (error) {
-                    console.log('error: ', error)
-                    return callback(error);
-                }
-            });
-            console.log(update.sql);
+            if(!query.aginAsk) {
+                let post = results[0];
+                //更新阅读pv
+                let updateString = 'update t_blog_post set pv=pv+1 where user_name = ? and create_time = ? ';
+                let update = conn.query(updateString, [post.user_name, post.create_time], function (error, results, fields) {
+                    if (error) {
+                        console.log('error: ', error)
+                        return callback(error);
+                    }
+                });
+                console.log(update.sql);
+            }
             return callback(null, results);
         }
     });
@@ -260,4 +262,21 @@ Post.getTag = function (tag, callback) {
     } else {
         return callback('参数异常！')
     }
+}
+
+Post.search = function (keyWord, callback) {
+    if(!keyWord)  return callback('参数异常！');
+    let sqlString = 'SELECT * FROM t_blog_post WHERE POSITION("' + keyWord + '" IN title)';
+    let findFuzzys = conn.query(sqlString, function(error, results, fields) {
+        if (error) {
+            console.log('error: ', error)
+            return callback(error);
+        }
+        if (results) {
+            return callback(null, results);
+        }
+    });
+
+    console.log(findFuzzys.sql)
+
 }

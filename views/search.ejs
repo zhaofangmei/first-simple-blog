@@ -1,0 +1,8 @@
+<%- include header %>
+<ul class="archive">
+<% posts.forEach(function (post, index) { %>
+    <li><time><%= moment(new Date(parseInt(post.create_time))).format('YYYY-MM-DD HH:MM:SS') %></time></li>
+    <li><a href="/user/<%= post.user_name %>/<%= post.create_time %>/<%= post.title %>"><%= post.title %></a></li>
+<% }) %>
+</ul>
+<%- include footer %>

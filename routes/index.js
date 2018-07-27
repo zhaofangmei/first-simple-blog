@@ -137,7 +137,6 @@ module.exports = function (app) {
         }
       });
     });
-
   });
 
   /**
@@ -145,8 +144,8 @@ module.exports = function (app) {
    */
   app.get('/post', checkLogin);
   app.get('/post', function (req, res) {
-    let userName = req.session.user.user_name;
-    Post.getTagsByName(userName, function(error, tags) {
+    // let userName = req.session.user.user_name;
+    Post.getTags(function(error, tags) {
       if (error) {
         req.flash('error', error);
         tags = [];
@@ -189,8 +188,29 @@ module.exports = function (app) {
   app.get('/logout', checkLogin);
   app.get('/logout', function (req, res) {
     req.session.user = null;
+    delete req.session.detailAsk;
     req.flash('success', '登出成功!');
     res.redirect('/'); //登出成功后跳转到主页
+  });
+
+  /**
+   * 博客--搜索
+   */
+  app.get('/search', checkLogin);
+  app.get('/search', function (req, res) {
+    Post.search(req.query.keyword, function (err, posts) {
+      if (err) {
+        req.flash('error', err); 
+        return res.redirect('/');
+      }
+      res.render('search', {
+        title: "SEARCH:" + req.query.keyword,
+        posts: posts,
+        user: req.session.user,
+        success: req.flash('success').toString(),
+        error: req.flash('error').toString()
+      });
+    });
   });
 
   /**
@@ -235,11 +255,24 @@ module.exports = function (app) {
   app.get('/user/:name/:time/:title', checkLogin);
   app.get('/user/:name/:time/:title', function (req, res) {
     let query = req.params;
+    let path = req.path;
+    query.aginAsk = false;
+    if(!req.session.detailAsk) {
+      req.session.detailAsk = [];
+    } else {
+      req.session.detailAsk.forEach((ask) => {
+        if(path == ask) {
+          query.aginAsk = true;
+          return;
+        } 
+      });
+    }
     Post.getOne(query, (err, posts) => {
       if (err) {
         req.flash('error', err);
         return res.redirect('/');
       }
+      if(!query.aginAsk) req.session.detailAsk.push(path);
       res.render('article', {
         title: query.title,
         post: posts[0],
@@ -249,6 +282,10 @@ module.exports = function (app) {
       });
     });
   });
+  
+  /**
+   *博客留言
+   */
   app.post('/user/:name/:time/:title', checkLogin);
   app.post('/user/:name/:time/:title', function (req, res) {
     let comment = {
