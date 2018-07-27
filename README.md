@@ -100,8 +100,18 @@ var upload = multer({ storage: storage })
 　　var moment = require('moment')
 
 　　在var app = express();后面加入 app.locals.moment = moment;
+ 
+
+　　
 
 　　（3）页面渲染调用格式为：<%= moment(new Date(parseInt("要解析的值"))).format('YYYY-MM-DD HH:MM:SS') %>
 
+　　
 
- 
+9、博客详情页面手动刷新，文章阅读量一直加，使用session记录
+
+　　
+
+10、文章标题搜索--模糊查询（POSITION）
+
+ 　　SELECT * FROM t_blog_post WHERE POSITION("' + keyWord + '" IN title)
