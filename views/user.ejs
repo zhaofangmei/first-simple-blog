@@ -1,16 +1,36 @@
 <%- include header %>
-<% posts.forEach(function (post, index) { %>
-    <p><h2><a href="/user/<%= post.user_name %>/<%= post.create_time%>/<%= post.title %>"><%= post.title %></a></h2></p>
-    <p class="info">
-        作者：<a href="/user/<%= post.user_name %>"><%= post.user_name %></a> | 
-        日期：<%= moment(new Date(parseInt(post.create_time))).format('YYYY-MM-DD HH:MM:SS') %> | 
-        标签：
-        <% if (post.tag) { %>
-          <a class="tag" href="/tags/<%= post.tag %>"><%= post.tag %></a>
-        <% } %>
-    </p>
-    <p><%- post.post %></p>
-    <p class="info">阅读：<%= post.pv %> | 评论：<%= post.comments.length %></p>
-<% }) %>
-<%- include pagination %>
-<%- include footer %>
+    <% posts.forEach(function (post, index) { %>
+        <div style="margin: 10px 20px 20px;padding: 10px;border: 1px solid #ccc;">
+            <div style="height: 50px;line-height: 50px;">
+                <a href="/user/<%= post.user_name %>">
+                    <img src="<%= post.head %>" class="l_head" />
+                </a>
+                <h2>
+                    <a href="/user/<%= post.user_name %>/<%= post.create_time%>/<%= post.title%>">
+                        <%= post.title %>
+                    </a>
+                </h2>
+            </div>
+            <div class="info">
+                作者：
+                <a href="/user/<%= post.user_name %>">
+                    <%= post.user_name %>
+                </a> | 日期：
+                <%= moment(new Date(parseInt(post.create_time))).format('YYYY-MM-DD HH:MM:SS') %> | 标签：
+                    <% if (post.tag) { %>
+                        <a class="tag" href="/tags/<%= post.tag %>">
+                            <%= post.tag %>
+                        </a>
+                        <% } %>
+            </div>
+            <div class="word_break">
+                <%- post.post %>
+            </div>
+            <div class="info">阅读：
+                <%= post.pv %> | 评论：
+                    <%= post.comments.length %>
+            </div>
+        </div>
+        <% }) %>
+            <%- include pagination %>
+                <%- include footer %>

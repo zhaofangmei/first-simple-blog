@@ -13,7 +13,7 @@ body {
 
 p {
     line-height: 24px;
-    margin: 1em 0;
+    /* margin: 1em 0; */
 }
 
 header {
@@ -145,4 +145,21 @@ article a:hover {
     text-align: center;
     font-size: 1em;
     margin: 0.5em 0;
+}
+
+.l_head {
+    float: left;
+    /* margin-left: -4em; */
+    box-shadow: 0px 1px 4px #888;
+}
+
+.r_head {
+    float: right;
+    /* margin-top: -2.5em; */
+    box-shadow: 0px 1px 4px #888;
+}
+
+.word_break > p{
+    word-wrap: break-word;
+    word-break: break-all;
 }

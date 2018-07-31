@@ -2,11 +2,12 @@ const DB = require('./db.js');
 const conn = DB.getConnection();
 const markdown = require('markdown').markdown;
 
-function Post(userName, title, tag, post) {
+function Post(userName, title, head, tag, post) {
     this.userName = userName;
     this.title = title;
     this.tag = tag;
     this.post = post;
+    this.head = head;
 }
 
 module.exports = Post;
@@ -17,6 +18,7 @@ Post.prototype.save = function (callback) {
         user_name: this.userName,
         create_time: time,
         title: this.title,
+        head: this.head,
         post: this.post,
         tag: this.tag,
         pv: 0,

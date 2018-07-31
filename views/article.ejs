@@ -1,19 +1,21 @@
 <%- include header %>
-<% if(user.user_name == post.user_name) { %>
-<p>
-    <span><a class="edit" href="/edit/<%= post.user_name %>/<%= post.create_time %>/<%= post.title %>">编辑</a></span>
-    <span><a class="edit" href="/remove/<%= post.user_name %>/<%= post.create_time %>/<%= post.title %>">删除</a></span>
-</p>
-<% } %>
-<p class="info">
-  作者：<a href="/user/<%= post.user_name %>"><%= post.user_name %></a> | 
-  日期：<%= moment(new Date(parseInt(post.create_time))).format('YYYY-MM-DD HH:MM:SS') %> | 
-  标签：
-  <% if (post.tag) { %>
-    <a class="tag" href="/tags/<%= post.tag %>"><%= post.tag %></a>
+<div style="border-bottom:  1px solid  #ccc;padding: 10px 0px;margin: 0px 10px 10px;">
+  <% if(user.user_name == post.user_name) { %>
+  <div>
+      <span><a class="edit" href="/edit/<%= post.user_name %>/<%= post.create_time %>/<%= post.title %>">编辑</a></span>
+      <span><a class="edit" href="/remove/<%= post.user_name %>/<%= post.create_time %>/<%= post.title %>">删除</a></span>
+  </div>
   <% } %>
-</p>
-<p><%- post.post %></p>
-<p class="info">阅读：<%= post.pv %> | 评论：<%= post.comments.length %></p>
+  <div class="info">
+    作者：<a href="/user/<%= post.user_name %>"><%= post.user_name %></a> | 
+    日期：<%= moment(new Date(parseInt(post.create_time))).format('YYYY-MM-DD HH:MM:SS') %> | 
+    标签：
+    <% if (post.tag) { %>
+      <a class="tag" href="/tags/<%= post.tag %>"><%= post.tag %></a>
+    <% } %>
+  </div>
+  <div class="word_break"><%- post.post %></div>
+  <div class="info">阅读：<%= post.pv %> | 评论：<%= post.comments.length %></div>
+</div>
 <%- include comment %>
 <%- include footer %>

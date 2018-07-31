@@ -50,7 +50,6 @@ module.exports = function (app) {
   /**
    *登录
    */
-  app.get('/login', checkNotLogin);
   app.get('/login', function (req, res) {
     res.render('login', {
       title: '登录',
@@ -68,6 +67,7 @@ module.exports = function (app) {
     User.get(userName, (err, users) => {
       if (!users || users.length <= 0) {
         req.flash('error', '用户不存在!');
+        if(req.session && req.session.user) delete req.session.user;
         return res.redirect('/login');
       }
       if (users[0].pass_word != passWord) {
@@ -125,16 +125,14 @@ module.exports = function (app) {
         return res.redirect('/reg'); //返回注册页
       }
 
-      newUser.save((err, success) => {
+      newUser.save((err, user) => {
         if (err) {
           req.flash('error', err);
           return res.redirect('/reg'); //注册失败返回注册页
         }
-        if (success == 'success') {
-          req.session.user = newUser; //用户信息存入 session
-          req.flash('success', '注册成功!');
-          res.redirect('/'); //注册成功后返回主页
-        }
+        req.session.user = user; //用户信息存入 session
+        req.flash('success', '注册成功!');
+        res.redirect('/'); //注册成功后返回主页
       });
     });
   });
@@ -144,7 +142,6 @@ module.exports = function (app) {
    */
   app.get('/post', checkLogin);
   app.get('/post', function (req, res) {
-    // let userName = req.session.user.user_name;
     Post.getTags(function(error, tags) {
       if (error) {
         req.flash('error', error);
@@ -167,17 +164,26 @@ module.exports = function (app) {
       req.flash('error', '标题不可为空!');
       return res.redirect('/post');
     }
-    let post = new Post(user.user_name, title, req.body.tag, req.body.post);
+    let post = new Post(user.user_name, title, user.head, req.body.tag, req.body.post);
 
-    post.save(function (error, success) {
-      if (error) {
-        req.flash('error', error);
-        return res.redirect('/post');
+    User.get(user.user_name, (err, users) => {
+      if (!users || users.length <= 0) {
+        req.flash('error', '用户不存在!');
+        if(req.session && req.session.user) delete req.session.user;
+        return res.redirect('/login');
       }
-      if (success = 'success') {
-        req.flash('success', '发布成功!');
-        res.redirect('/'); //发表成功跳转到主页
-      }
+
+      post.save(function (error, success) {
+        if (error) {
+          req.flash('error', error);
+          return res.redirect('/post');
+        }
+        if (success = 'success') {
+          req.flash('success', '发布成功!');
+          res.redirect('/'); //发表成功跳转到主页
+        }
+      });
+
     });
 
   });
@@ -222,6 +228,7 @@ module.exports = function (app) {
     User.get(userName, (err, users) => {
       if (!users || users.length <= 0) {
         req.flash('error', '用户不存在!');
+        if(req.session && req.session.user) delete req.session.user;
         return res.redirect('/login');
       }
       let query = {
@@ -288,10 +295,14 @@ module.exports = function (app) {
    */
   app.post('/user/:name/:time/:title', checkLogin);
   app.post('/user/:name/:time/:title', function (req, res) {
+    var md5 = crypto.createHash('md5'),
+    email_MD5 = md5.update(req.body.email.toLowerCase()).digest('hex'),
+    head = "http://www.gravatar.com/avatar/" + email_MD5 + "?s=48"; 
     let comment = {
       user_name: req.body.name,
       create_time: new Date().getTime(),
       website: req.body.website,
+      head: head,
       content: req.body.content
     }
     let newComment = new Comment(req.params.name, req.params.time, req.params.title, comment);
@@ -453,6 +464,10 @@ module.exports = function (app) {
       });
     });
 
+  });
+
+  app.use(function (req, res) {
+    res.render("404");
   });
 
   function checkLogin(req, res, next) {

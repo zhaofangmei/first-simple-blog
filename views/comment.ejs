@@ -1,20 +1,30 @@
-<br />
-<% post.comments.forEach(function (comment, index) { %>
-  <p><a href="<%= comment.website %>"><%= comment.user_name %></a>
-  <span class="info"> 回复于 <%= moment(new Date(parseInt(comment.create_time))).format('YYYY-MM-DD HH:MM:SS') %> </span></p>
-  <p><%- comment.content %></p>
-<% }) %>
+<div style="margin: 0px 20px 20px;">
+  <div style="border-bottom:  1px solid  #ccc;padding: 10px 0px;margin: 0px 10px 10px;">
+    <% post.comments.forEach(function (comment, index) { %>
+    <div style="padding: 10px 0px;">
+      <div style="height: 50px;line-height: 50px;">
+        <img src="<%= comment.head %>" class="l_head" style="width: 24px;height: 24px;margin-top: 10px;"/>
+        <a href="<%= comment.website %>"><%= comment.user_name %></a>
+        <span class="info"> 回复于 <%= moment(new Date(parseInt(comment.create_time))).format('YYYY-MM-DD HH:MM:SS') %> </span>
+      </div>
+      <div><%- comment.content %></div>
+    </div>
+    <% }) %>
+  </div>
 
-<form method="post" action="/user/<%= post.user_name %>/<%= post.create_time %>/<%= post.title %>">
-<% if (user) { %>
-  姓名：<input type="text" name="name" value="<%= user.user_name %>" /><br />
-  邮箱：<input type="text" name="email" value="<%= user.email %>" /><br />
-  网址：<input type="text" name="website" value="/user/<%= user.user_name %>" /><br />
-<% } else { %>
-  姓名：<input type="text" name="name" /><br />
-  邮箱：<input type="text" name="email" /><br />
-  网址：<input type="text" name="website" value="http://" /><br />
-<% } %>
-  <textarea name="content" rows="5" cols="80"></textarea><br />
-  <input type="submit" value="留言" />
-</form>
+  <div style="margin: 0px 20px 10px;">
+    <form method="post" action="/user/<%= post.user_name %>/<%= post.create_time %>/<%= post.title %>">
+      <% if (user) { %>
+        姓名：<input type="text" name="name" value="<%= user.user_name %>" /><br />
+        邮箱：<input type="text" name="email" value="<%= user.email %>" /><br />
+        网址：<input type="text" name="website" value="/user/<%= user.user_name %>" /><br />
+      <% } else { %>
+        姓名：<input type="text" name="name" /><br />
+        邮箱：<input type="text" name="email" /><br />
+        网址：<input type="text" name="website" value="http://" /><br />
+      <% } %>
+      <textarea name="content" rows="5" cols="80"></textarea><br />
+      <input type="submit" value="留言" />
+    </form>
+  </div>
+</div>
