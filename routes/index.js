@@ -32,6 +32,7 @@ module.exports = function (app) {
       }
       posts.forEach(post => {
         post.comments = JSON.parse(post.comments);
+        post.reprint_info = JSON.parse(post.reprint_info);
       });
       let total = sumResults[0].sum || 0;
       res.render('index', {
@@ -241,6 +242,9 @@ module.exports = function (app) {
           req.flash('error', err);
           return res.redirect('/');
         }
+        posts.forEach((post) => {
+          post.reprint_info = JSON.parse( post.reprint_info);
+        });
         let total = sumResults[0].sum || 0;
         res.render('user', {
           title: users[0].user_name,
@@ -279,14 +283,22 @@ module.exports = function (app) {
         req.flash('error', err);
         return res.redirect('/');
       }
-      if(!query.aginAsk) req.session.detailAsk.push(path);
-      res.render('article', {
-        title: query.title,
-        post: posts[0],
-        user: req.session.user,
-        success: req.flash('success').toString(),
-        error: req.flash('error').toString()
-      });
+      if(posts && posts.length > 0) {
+        if(!query.aginAsk) req.session.detailAsk.push(path);
+        posts.forEach((post) => {
+          post.reprint_info = JSON.parse(post.reprint_info);
+        });
+        res.render('article', {
+          title: query.title,
+          post: posts[0],
+          user: req.session.user,
+          success: req.flash('success').toString(),
+          error: req.flash('error').toString()
+        });
+      } else {
+        req.flash('error', '该文章已不存在！');
+        return res.redirect('/');
+      }
     });
   });
   
@@ -378,8 +390,6 @@ module.exports = function (app) {
       req.flash('success', '修改成功!');
       res.redirect(url);
     });
-
-
   });
 
   /**
@@ -395,16 +405,51 @@ module.exports = function (app) {
     Post.remove(query, (err, success) => {
       if(err) {
         req.flash('error',err);
-        res.redirect('back');
+        return res.redirect('back');
       }
       if(success == 'success') {
         req.flash('success','刪除成功！');
+        return res.redirect('/');
       } else {
         req.flash('error','无权限！');
-        res.redirect('back');
+        return res.redirect('back');
       }
     });
   });
+  
+  /**
+   * 博客--转载
+   */
+  app.get('/reprint/:name/:time/:title', checkLogin);
+  app.get('/reprint/:name/:time/:title', function (req, res) {
+    let query = {
+      name: req.params.name,
+      time: req.params.time,
+      title: req.params.title
+    }
+    Post.edit(query, (err, posts) => {
+      if (err) {
+        req.flash('error', err);
+        return res.redirect('back');
+      }
+      if (posts && posts.length > 0) {
+        let post = posts[0];
+        let currentUser = req.session.user;
+        let reprint_from = {name: post.user_name, time: post.create_time, title: post.title};
+        let reprint_to = {name: currentUser.user_name, head: currentUser.head};
+        Post.reprint(reprint_from, reprint_to, function (err, post) {
+          if (err) {
+            req.flash('error', err); 
+            return res.redirect('back');
+          }
+          req.flash('success', '转载成功!');
+          return res.redirect('/');
+        });
+
+      }
+    });
+  });
+
 
   /**
    * 文件上传

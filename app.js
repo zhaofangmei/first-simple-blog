@@ -58,7 +58,7 @@ app.use(session({
 }));
 
 app.use(function (req, res, next) {
-  console.log('1111111111111 path', req.path);
+  // console.log('1111111111111 path', req.path);
   next();
 });
 

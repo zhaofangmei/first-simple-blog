@@ -21,14 +21,21 @@
                         <a class="tag" href="/tags/<%= post.tag %>">
                             <%= post.tag %>
                         </a>
-                        <% } %>
+                    <% } %>
+                    <% if (post.reprint_info.reprint_from) { %>
+                        &nbsp; | <a href="/user/<%= post.reprint_info.reprint_from.user_name %>/<%= post.reprint_info.reprint_from.create_time %>/<%= post.reprint_info.reprint_from.title %>">原文链接</a>
+                    <% } %>
             </div>
             <div class="word_break">
                 <%- post.post %>
             </div>
-            <div class="info">阅读：
-                <%= post.pv %> | 评论：
-                    <%= post.comments.length %>
+            <div class="info">
+                阅读：<%= post.pv %> | 评论：<%= post.comments.length %> | 转载：
+                <% if (post.reprint_info.reprint_to) { %>
+                  <%= post.reprint_info.reprint_to.length %>
+                <% } else { %>
+                  <%= 0 %>
+                <% } %>
             </div>
         </div>
         <% }) %>

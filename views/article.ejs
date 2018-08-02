@@ -1,11 +1,34 @@
 <%- include header %>
 <div style="border-bottom:  1px solid  #ccc;padding: 10px 0px;margin: 0px 10px 10px;">
-  <% if(user.user_name == post.user_name) { %>
-  <div>
+  <div style="padding: 10px 0px;">
+      <% if(user.user_name == post.user_name) { %>
       <span><a class="edit" href="/edit/<%= post.user_name %>/<%= post.create_time %>/<%= post.title %>">编辑</a></span>
       <span><a class="edit" href="/remove/<%= post.user_name %>/<%= post.create_time %>/<%= post.title %>">删除</a></span>
+      <% } else { %>
+        <!-- <span><a class="edit" href="/reprint/<%= post.user_name %>/<%= post.create_time %>/<%= post.title %>">转载</a></span> -->
+        <% var flag = 1 %>
+        <% if (user && (user.user_name != post.user_name)) { %>
+          <% if ((post.reprint_info.reprint_from != undefined) && (user.user_name == post.reprint_info.reprint_from.user_name)) { %>
+            <% flag = 0 %>
+          <% } %>
+          <% if ((post.reprint_info.reprint_to != undefined)) { %>
+            <% post.reprint_info.reprint_to.forEach(function (reprint_to, index) { %>
+              <% if (user.user_name == reprint_to.user_name) { %>
+                <% flag = 0 %>
+              <% } %>
+            <% }) %>
+          <% } %>
+        <% } else { %>
+          <% flag = 0 %>
+        <% } %>
+        <% if (flag) { %>
+          <span><a class="edit" href="/reprint/<%= post.user_name %>/<%= post.create_time %>/<%= post.title %>">转载</a></span>
+        <% } %>
+
+
+      <% } %>
   </div>
-  <% } %>
+
   <div class="info">
     作者：<a href="/user/<%= post.user_name %>"><%= post.user_name %></a> | 
     日期：<%= moment(new Date(parseInt(post.create_time))).format('YYYY-MM-DD HH:MM:SS') %> | 
@@ -13,9 +36,19 @@
     <% if (post.tag) { %>
       <a class="tag" href="/tags/<%= post.tag %>"><%= post.tag %></a>
     <% } %>
+    <% if (post.reprint_info.reprint_from) { %>
+      &nbsp; | <a href="/user/<%= post.reprint_info.reprint_from.user_name %>/<%= post.reprint_info.reprint_from.create_time %>/<%= post.reprint_info.reprint_from.title %>">原文链接</a>
+    <% } %>
   </div>
   <div class="word_break"><%- post.post %></div>
-  <div class="info">阅读：<%= post.pv %> | 评论：<%= post.comments.length %></div>
+  <div class="info">
+    阅读：<%= post.pv %> | 评论：<%= post.comments.length %> | 转载：
+    <% if (post.reprint_info.reprint_to) { %>
+      <%= post.reprint_info.reprint_to.length %>
+    <% } else { %>
+      <%= 0 %>
+    <% } %>
+  </div>
 </div>
 <%- include comment %>
 <%- include footer %>
