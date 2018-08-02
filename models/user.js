@@ -47,7 +47,6 @@ User.get = function (name, callback) {
       console.log('error: ', error)
       return callback(error); //错误，返回error信息
     }
-    console.log('results: ', results)
     if (results) {
       return callback(null, results);
     }

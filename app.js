@@ -24,6 +24,9 @@ var connection = mysql.createConnection({
 var sessionStore = new MySQLStore({}/* session store options */, connection);
 
 var app = express();
+var fs = require('fs');
+var accessLog = fs.createWriteStream('access.log', {flags: 'a'});
+var errorLog = fs.createWriteStream('error.log', {flags: 'a'});
 
 //ejs渲染moment
 app.locals.moment = moment; 
@@ -40,10 +43,16 @@ app.use(flash());
 
 //加载环境变量
 app.use(logger('dev'));
+app.use(logger({stream: accessLog}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(function (err, req, res, next) {
+  var meta = '[' + new Date() + '] ' + req.url + '\n';
+  errorLog.write(meta + err.stack + '\n');
+  next();
+});
 //注意：放在路由之前
 app.use(session({
   secret: settings.cookieSecret,
