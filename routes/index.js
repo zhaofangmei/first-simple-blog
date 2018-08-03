@@ -318,6 +318,10 @@ module.exports = function (app) {
       head: head,
       content: req.body.content
     }
+    if(!comment.content) {
+      req.flash('error','评论内容不可为空！');
+      return res.redirect('back');
+    }
     let newComment = new Comment(req.params.name, req.params.time, req.params.title, comment);
 
     newComment.save((err,success) => {
