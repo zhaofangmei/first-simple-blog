@@ -115,3 +115,17 @@ var upload = multer({ storage: storage })
 10、文章标题搜索--模糊查询（POSITION）
 
  　　SELECT * FROM t_blog_post WHERE POSITION("' + keyWord + '" IN title)
+
+11、使用KindEditor
+
+　　（1）http://www.kindsoft.net/ 下载最新的 KindEditor 压缩包，解压后将文件夹重命名为 kindEditor 并放到 public 文件夹下。
+
+　　（2）修改header.ejs
+
+　　　　
+
+　　(3)i定义图片上传接口
+
+　　　　https://blog.csdn.net/dexing07/article/details/53870580
+
+　　　　https://blog.csdn.net/charlene0824/article/details/51234394
