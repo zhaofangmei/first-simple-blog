@@ -3,6 +3,7 @@ const User = require('../models/user.js');
 const Post = require('../models/post.js');
 const Comment = require('../models/comment.js');
 const multer = require('multer');
+const formidable = require('formidable');
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -511,6 +512,33 @@ module.exports = function (app) {
 
   });
 
+  /**
+   * kindEdit 图片上传
+   */
+  app.post('/uploadImg',function(req,res,next) {
+    var form = new formidable.IncomingForm();
+    form.keepExtensions = true;     //设置该属性为true可以使得上传的文件保持原来的文件的扩展名。
+    form.uploadDir=__dirname+'/../public/upload';   //设置上传文件存放的文件夹，默认为系统的临时文件夹，可以使用fs.rename()来改变上传文件的存放位置和文件名
+    //form.parse(request, [callback]) 该方法会转换请求中所包含的表单数据，callback会包含所有字段域和文件信息
+    form.parse(req,function(err, fields, files){
+      if(err){
+        throw err;
+      }
+      var image = files.imgFile;  //这是整个files流文件对象,是转换成有利于传输的数据格式
+      var path = image.path;      //从本地上传的资源目录加文件名:如E:\\web\\blog\\upload\\upload_0a14.jpg
+      /*下面这里是通过分割字符串来得到文件名*/
+      var arr = path.split('\\');
+      var name = arr[arr.length-1];
+      var url = "/upload/" + name;
+      var info = {"error": 0,"url": url};
+      //info是用来返回页面的图片地址
+      res.send(info);
+    })
+  });
+
+  /**
+   * 404
+   */
   app.use(function (req, res) {
     res.render("404");
   });

@@ -1,6 +1,6 @@
 const DB = require('./db.js');
 const conn = DB.getConnection();
-const markdown = require('markdown').markdown;
+// const markdown = require('markdown').markdown;
 
 function Post(userName, title, head, tag, post) {
     this.userName = userName;
@@ -51,9 +51,9 @@ Post.getAll = function (name, callback) {
             return callback(error);
         }
         if (results) {
-            results.forEach(doc => {
-                doc.post = markdown.toHTML(doc.post)
-            });
+            // results.forEach(doc => {
+            //     doc.post = markdown.toHTML(doc.post)
+            // });
             return callback(null, results);
         }
     });
@@ -77,9 +77,9 @@ Post.getPage = function (params, callback) {
             return callback(error);
         }
         if (results) {
-            results.forEach(doc => {
-                doc.post = markdown.toHTML(doc.post)
-            });
+            // results.forEach(doc => {
+            //     doc.post = markdown.toHTML(doc.post)
+            // });
             let countString = 'select count(*) as sum from t_blog_post ';
             if (params.name) {
                 countString += 'where user_name = "' + params.name + '"';
@@ -119,7 +119,7 @@ Post.getOne = function (query, callback) {
         }
         if (results && results.length > 0) {
             results.forEach(doc => {
-                doc.post = markdown.toHTML(doc.post);
+                // doc.post = markdown.toHTML(doc.post);
                 doc.comments = JSON.parse(doc.comments);
             });
             if(!query.aginAsk) {
