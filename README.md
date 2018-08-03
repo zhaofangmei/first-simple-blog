@@ -82,7 +82,8 @@ var upload = multer({ storage: storage })
   　　// ...
 　　});
 　
-7、留言功能实现
+ 
+  7、留言功能实现
 
 　conng更新Post的comments时，会报错：Error: ER_DATA_TOO_LONG: Data too long for column 'comments' at row 1
 
