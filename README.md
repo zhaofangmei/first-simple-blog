@@ -131,14 +131,13 @@ var upload = multer({ storage: storage })
 
 　　　　https://blog.csdn.net/charlene0824/article/details/51234394
 
-12、项目存在问题：
-   （1）数据库操作save、update方法应该封装通用的
-   （2）数据库用户数据清空，浏览器本地session存有user，还可以继续保存
-   （3）评论时，评论的用户信息应该不可编辑
-   
-13、项目启动
- （1）网上教程本地安装mysql
- （2）setting.js配置mysql数据库连接
- （3）建表sql为t_blog_post.sql、t_blog_user.sql
- （4）npm install 安装项目依赖
- （5）npm run start 启动项目---localhost:3001,端口号可在package.json配置
+12、项目启动
+　　（1）网上教程本地安装mysql
+  
+　　（2）setting.js配置mysql数据库连接
+  
+　　（3）建表sql为t_blog_post.sql、t_blog_user.sql
+  
+　　（4）npm install 安装项目依赖
+  
+　　（5）npm run start 启动项目---localhost:3001,端口号可在package.json配置
