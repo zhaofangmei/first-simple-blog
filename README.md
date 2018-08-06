@@ -132,7 +132,8 @@ var upload = multer({ storage: storage })
 　　　　https://blog.csdn.net/charlene0824/article/details/51234394
 
 12、项目启动
-　　（1）网上教程本地安装mysql
+　　
+   （1）网上教程本地安装mysql
   
 　　（2）setting.js配置mysql数据库连接
   
