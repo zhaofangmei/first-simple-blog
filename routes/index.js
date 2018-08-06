@@ -211,13 +211,21 @@ module.exports = function (app) {
         req.flash('error', err); 
         return res.redirect('/');
       }
-      res.render('search', {
-        title: "SEARCH:" + req.query.keyword,
-        posts: posts,
-        user: req.session.user,
-        success: req.flash('success').toString(),
-        error: req.flash('error').toString()
-      });
+      console.log('>>>>>>>>>>>>posts:',posts);
+      if(posts &&  posts.length > 0) {
+        res.render('search', {
+          title: "SEARCH:" + req.query.keyword,
+          posts: posts,
+          user: req.session.user,
+          success: req.flash('success').toString(),
+          error: req.flash('error').toString()
+        });
+      } else {
+        req.flash('error', '暂无记录！'); 
+        return res.redirect('back');
+      }
+
+
     });
   });
 
@@ -322,17 +330,32 @@ module.exports = function (app) {
       req.flash('error','评论内容不可为空！');
       return res.redirect('back');
     }
-    let newComment = new Comment(req.params.name, req.params.time, req.params.title, comment);
-
-    newComment.save((err,success) => {
+    //1、判断是否存在该用户
+    User.get(comment.user_name, (err, users) => {
       if(err) {
-        req.flash('error',err);
+        req.flash('error', err);
         return res.redirect('back');
       }
-      if(success == 'success') {
-        req.flash('success', '留言成功!');
+      if(users && users.length > 0) {
+        //2、更新post表的comment数据
+        let newComment = new Comment(req.params.name, req.params.time, req.params.title, comment);
+    
+        newComment.save((error,success) => {
+          if(error) {
+            req.flash('error',error);
+            return res.redirect('back');
+          }
+          if(success == 'success') {
+            req.flash('success', '留言成功!');
+          }
+          res.redirect('back');
+        });
+      } else {
+        req.flash('error', '用户不存在!');
+        if(req.session && req.session.user) delete req.session.user;
+        return res.redirect('/login');
       }
-      res.redirect('back');
+
     });
   });
 

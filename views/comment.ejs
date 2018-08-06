@@ -13,18 +13,18 @@
   </div>
 
   <div style="margin: 0px 20px 10px;">
+    <% if (user) { %>
     <form method="post" action="/user/<%= post.user_name %>/<%= post.create_time %>/<%= post.title %>">
-      <% if (user) { %>
+      <div style="display: none;">
         姓名：<input type="text" name="name" value="<%= user.user_name %>" /><br />
         邮箱：<input type="text" name="email" value="<%= user.email %>" /><br />
         网址：<input type="text" name="website" value="/user/<%= user.user_name %>" /><br />
-      <% } else { %>
-        姓名：<input type="text" name="name" /><br />
-        邮箱：<input type="text" name="email" /><br />
-        网址：<input type="text" name="website" value="http://" /><br />
+      </div>
+        <textarea name="content" rows="20" style="width:90%;"></textarea><br />
+        <input type="submit" value="留言" />
+      </form>
+      <% } else {%>
+        <a href="/login/">注册用户登录后才能发表评论</a>
       <% } %>
-      <textarea name="content" rows="5" cols="80"></textarea><br />
-      <input type="submit" value="留言" />
-    </form>
   </div>
 </div>

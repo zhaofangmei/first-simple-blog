@@ -319,12 +319,14 @@ Post.getTag = function (tag, callback) {
 
 Post.search = function (keyWord, callback) {
     if(!keyWord)  return callback('参数异常！');
+    console.log('>>>>>>>>>>>>keyWord: ',keyWord)
     let sqlString = 'SELECT * FROM t_blog_post WHERE POSITION("' + keyWord + '" IN title)';
     let findFuzzys = conn.query(sqlString, function(error, results, fields) {
         if (error) {
             console.log('error: ', error)
             return callback(error);
         }
+        console.log('>>>>>>>>>>>>results: ',results)
         if (results) {
             return callback(null, results);
         }
